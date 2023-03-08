@@ -37,7 +37,7 @@ namespace TenmoClient
         private bool RunUnauthenticated()
         {
             console.PrintLoginMenu();
-            int menuSelection = console.PromptForInteger("Please choose an option", 0, 2, 1);
+            int menuSelection = console.PromptForInteger("Please choose an option", 0, 3, 1);
             while (true)
             {
                 if (menuSelection == 0)
@@ -56,6 +56,12 @@ namespace TenmoClient
                 {
                     // Register a new user
                     Register();
+                    return true;    // Keep the main menu loop going
+                }
+                if (menuSelection == 3)
+                {
+                    // Register a new user
+                    ViewUsers();
                     return true;    // Keep the main menu loop going
                 }
                 console.PrintError("Invalid selection. Please choose an option.");
@@ -163,7 +169,20 @@ namespace TenmoClient
 
         public void ViewBalance()
         {
-            console.PrintSuccess(Convert.ToString(tenmoApiService.ViewBalance(apiUser.UserId)));
+            
+            int balance = tenmoApiService.ViewBalance(1001);
+            Console.WriteLine(balance);
+            Console.ReadLine();
+        }
+
+        public void ViewUsers()
+        {
+            List<User> users = tenmoApiService.ViewUsers();
+
+            foreach(User user in users)
+            {
+                console.PrintSuccess(user.Username);
+            }
         }
     }
 }
