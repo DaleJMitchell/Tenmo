@@ -1,5 +1,6 @@
 ﻿using RestSharp;
 using System.Collections.Generic;
+using System.Net.Http;
 using TenmoClient.Models;
 
 namespace TenmoClient.Services
@@ -12,6 +13,17 @@ namespace TenmoClient.Services
 
         // Add methods to call api here...
 
+        public int ViewBalance(int id)
+        {
+            RestRequest request = new RestRequest($"users/{id}");
+            IRestResponse<int> response = client.Get<int>(request);
+
+            if (!response.IsSuccessful)
+            {
+                throw new HttpRequestException($"Account Balance Could Not Be Located");
+            }
+            return response.Data;
+        }
 
     }
 }

@@ -119,5 +119,40 @@ namespace TenmoServer.DAO
 
             return u;
         }
+
+        public int GetBalance(int userId)
+        {
+            int balance = 0;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT balance FROM account WHERE user_id = @user_id", conn);
+                    cmd.Parameters.AddWithValue("@user_id", userId);
+                    SqlDataReader sdr = cmd.ExecuteReader();
+
+                    if (sdr.Read())
+                    {
+                        balance = Convert.ToInt32(sdr["balance"]);
+                    }
+                }
+            } catch (SqlException)
+            {
+                throw;
+            }
+            return balance;
+        }
+
+        //public User GetUserFromReader(SqlDataReader sdr)
+        //{
+        //    User user = new User();
+        //    user.UserId = Convert.ToInt32(sdr["user_id"]);
+        //    user.Username = Convert.ToString(sdr["username"]);
+        //    user.PasswordHash = Convert.ToString(sdr["password"]);
+        //    user.Salt = Convert.ToString(sdr["salt"]);
+
+        //    return user;
+        //}
     }
 }
