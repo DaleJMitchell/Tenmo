@@ -144,6 +144,8 @@ namespace TenmoServer.DAO
             return balance;
         }
 
+       
+
         //public User GetUserFromReader(SqlDataReader sdr)
         //{
         //    User user = new User();

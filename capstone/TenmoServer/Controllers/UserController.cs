@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 using TenmoServer.DAO;
+using TenmoServer.Models;
+using System.Collections.Generic;
 
 namespace TenmoServer.Controllers
 {
@@ -10,17 +13,28 @@ namespace TenmoServer.Controllers
     public class UserController : Controller
     {
         private readonly IUserDao userDao;
+        private readonly IAccountDao accountDao;
 
-        public UserController(IUserDao _userDao)
+        public UserController(IUserDao _userDao, IAccountDao _accountDao)
         {
             this.userDao = _userDao;
+            this.accountDao = _accountDao;
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetBalance(int id)
+        public int GetBalance(int id)
         {
-            int balance = userDao.GetBalance(id);
-            return Ok(balance);
+            int balance = accountDao.GetBalance(id);
+            return balance;
+        
         }
+
+        [HttpGet]
+        public List<User> GetAllUsers()
+        {
+            return userDao.GetUsers();
+        }
+
+        
     }
 }

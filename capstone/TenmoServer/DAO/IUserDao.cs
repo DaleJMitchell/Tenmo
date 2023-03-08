@@ -10,5 +10,6 @@ namespace TenmoServer.DAO
         List<User> GetUsers();
 
         int GetBalance(int user_id);
+        
     }
 }
