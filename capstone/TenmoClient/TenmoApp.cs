@@ -9,6 +9,8 @@ namespace TenmoClient
     {
         private readonly TenmoConsoleService console = new TenmoConsoleService();
         private readonly TenmoApiService tenmoApiService;
+        private ApiUser apiUser;
+        
 
         public TenmoApp(string apiUrl)
         {
@@ -73,7 +75,7 @@ namespace TenmoClient
 
             if (menuSelection == 1)
             {
-                // View your current balance
+                ViewBalance();
             }
 
             if (menuSelection == 2)
@@ -116,8 +118,8 @@ namespace TenmoClient
 
             try
             {
-                ApiUser user = tenmoApiService.Login(loginUser);
-                if (user == null)
+                apiUser = tenmoApiService.Login(loginUser);
+                if (apiUser == null)
                 {
                     console.PrintError("Login failed.");
                 }
@@ -157,6 +159,11 @@ namespace TenmoClient
                 console.PrintError("Registration was unsuccessful.");
             }
             console.Pause();
+        }
+
+        public void ViewBalance()
+        {
+            console.PrintSuccess(Convert.ToString(tenmoApiService.ViewBalance(apiUser.UserId)));
         }
     }
 }
