@@ -6,11 +6,11 @@ using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
-    public class UserDao
+    public class AccountDao
     {
         public string connectionString;
 
-        public UserDao(string dbConnectionString) 
+        public AccountDao(string dbConnectionString) 
         {
             connectionString = dbConnectionString;
         }

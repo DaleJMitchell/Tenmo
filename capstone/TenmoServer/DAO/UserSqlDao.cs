@@ -128,7 +128,7 @@ namespace TenmoServer.DAO
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    SqlCommand cmd = new SqlCommand("SELECT balance FROM account WHERE user_id = @user_id");
+                    SqlCommand cmd = new SqlCommand("SELECT balance FROM account WHERE user_id = @user_id", conn);
                     cmd.Parameters.AddWithValue("@user_id", userId);
                     SqlDataReader sdr = cmd.ExecuteReader();
 
