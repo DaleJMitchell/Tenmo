@@ -16,7 +16,7 @@
 
         public Transfer(int id, int type_Id, int status_Id, int account_From, int account_To, decimal amounttoTransfer)
         {
-            Id = id;
+            this.Id = id;
             this.type_Id = type_Id;
             this.status_Id = status_Id;
             this.account_From = account_From;

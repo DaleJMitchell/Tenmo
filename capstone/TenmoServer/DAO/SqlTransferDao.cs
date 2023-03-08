@@ -27,9 +27,10 @@ namespace TenmoServer.DAO
                     "OUTPUT INSERTED.transfer_id " +
                     "VALUES (SELECT account_id WHERE account_id = @account_from]) , (SELECT account_id WHERE account_id = @account_to);" ,conn) ;
                     cmd.Parameters.AddWithValue("@account_from", transfer.account_From);
+                    cmd.Parameters.AddWithValue("@account_to", transfer.account_To);
 
                     
-                    transfer = Convert.ToInt32(cmd.ExecuteScalar()) ;
+                   // transfer = Convert.ToInt32(cmd.ExecuteScalar()) ;
                 }
             }
             catch (Exception ex)
@@ -42,11 +43,11 @@ namespace TenmoServer.DAO
         private Transfer CreateTransferFromReader(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();
-            Transfer.Id = Convert.ToInt32(reader["transfer_type_id"]);
-            Transfer.status_Id = Convert.ToInt32(reader["transfer_status_id"]);
-            Transfer.account_From = Convert.ToInt32(reader["account_from"])
-            Transfer.account_To = Convert.ToInt32(reader["account_to"]);
-            Transfer.amount = Convert.ToDecimal(reader["amount"]);
+            transfer.Id = Convert.ToInt32(reader["transfer_type_id"]);
+            transfer.status_Id = Convert.ToInt32(reader["transfer_status_id"]);
+            transfer.account_From = Convert.ToInt32(reader["account_from"]);
+            transfer.account_To = Convert.ToInt32(reader["account_to"]);
+            transfer.amounttoTransfer = Convert.ToDecimal(reader["amount"]);
 
             return transfer;
         }

@@ -22,5 +22,25 @@ namespace TenmoServer.Controllers
             Transfer newTransfer = transferDao.SendMoney(transfer);
             return Ok(newTransfer);
         }
+
+        [HttpGet("transfer")]
+        public ActionResult<IList<Transfer>> GetTransferHistory()
+        {
+            return transferDao.List();
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<Transfer> GetTransferById(int id)
+        {
+            Transfer transfer = transferDao.Get(id);
+            if (transfer != null)
+            {
+                return Ok(transfer);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }
