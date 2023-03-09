@@ -88,8 +88,9 @@ namespace TenmoServer.Controllers
             }
         }
 
+        //To do: add status codes
         [HttpGet("request/{userId}")]
-        public ActionResult<Transfer> GetRequests()
+        public ActionResult<List<Transfer>> GetRequests()
         {
             return transferDao.GetRequests();
         }
