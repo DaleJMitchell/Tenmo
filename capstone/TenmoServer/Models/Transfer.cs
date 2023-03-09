@@ -8,8 +8,7 @@
         public int account_From { get; set; }
         public int account_To { get; set;}
         public decimal amounttoTransfer { get; set; }
-        public string status { get; set; }
-        public string type { get; set; }
+        
 
         public Transfer()
         {

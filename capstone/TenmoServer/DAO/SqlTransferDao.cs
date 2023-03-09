@@ -15,124 +15,69 @@ namespace TenmoServer.DAO
             connectionString = connString;
         }
         private Transfer transferRequest = new Transfer();
+
         public Transfer SendMoney(Transfer transfer)
         {
-            bool transferValidity = CheckTransferValidity(transfer);
-            if (!transferValidity)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                transfer = RejectTransfer(transfer);
+                conn.Open();
+                try
+                {
+                    SqlCommand cmd = new SqlCommand("INSERT INTO transfer (account_from, account_to, amount, transfer_type_id, transfer_status_id) " +
+                                                    "OUTPUT INSERTED.transfer_id " +
+                                                    "VALUES (@account_from, @account_to, @amount, @transfer_type_id, @transfer_status_id);", conn);
+                    cmd.Parameters.AddWithValue("@account_from", transfer.account_From);
+                    cmd.Parameters.AddWithValue("@account_to", transfer.account_To);
+                    cmd.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
+                    cmd.Parameters.AddWithValue("@transfer_type_id", 2);
+                    cmd.Parameters.AddWithValue("@transfer_status_id", 1);
+                    int transferId = Convert.ToInt32(cmd.ExecuteScalar());
+                    transfer.Id = transferId;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("transfer did not go through");
+                }
+                bool transferValidity = CheckTransferValidity(transfer);
+                if (!transferValidity)
+                {
+                    transfer = RejectTransfer(transfer);
+                    return transfer;
+                }
+                else
+                {
+                    transfer = AcceptTransfer(transfer);
+                }
+                SqlTransaction transaction = conn.BeginTransaction();
+                try
+                {
+                    SqlCommand cmd2 = new SqlCommand("UPDATE account SET balance -= @amount WHERE account_id = @account_from", conn);
+                    cmd2.Transaction = transaction;
+                    cmd2.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
+                    cmd2.Parameters.AddWithValue("@account_from", transfer.account_From);
+                    cmd2.ExecuteNonQuery();
+
+                    SqlCommand cmd3 = new SqlCommand("UPDATE account SET balance += @amount WHERE account_id = @account_to", conn);
+                    cmd3.Transaction = transaction;
+                    cmd3.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
+                    cmd3.Parameters.AddWithValue("@account_to", transfer.account_To);
+                    cmd3.ExecuteNonQuery();
+
+                    transaction.Commit();
+                    transfer = AcceptTransfer(transfer);
+
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    transfer = RejectTransfer(transfer);
+                    return transfer;
+                }
                 return transfer;
             }
-            int transferTypeId = AddTransferType("send");
-            int transferStatusId = AddTransferStatus("pending");
-            transfer.status_Id = transferStatusId;
-            transfer.type_Id = transferTypeId;
-
-            try
-            {
-                transfer = null;
-
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    try
-                    {
-                        SqlCommand cmd = new SqlCommand("INSERT INTO transfer (account_from, account_to, amount, transfer_type_id, transfer_status_id) " +
-                                                        "OUTPUT INSERTED.transfer_id " +
-                                                        "VALUES (@account_from, @account_to, @amount, @transfer_type_id, @transfer_status_id);", conn);
-                        cmd.Parameters.AddWithValue("@account_from", transfer.account_From);
-                        cmd.Parameters.AddWithValue("@account_to", transfer.account_To);
-                        cmd.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
-                        cmd.Parameters.AddWithValue("@transfer_type_id", transferTypeId);
-                        cmd.Parameters.AddWithValue("@transfer_status_id", transferStatusId);
-                        int transferId = Convert.ToInt32(cmd.ExecuteScalar());
-                        transfer.Id = transferId;
-                    }
-                    catch (Exception){ }
-
-                    SqlTransaction transaction = conn.BeginTransaction();
-                    try
-                    {
-                        SqlCommand cmd2 = new SqlCommand("UPDATE account SET balance -= @amount WHERE account_id = @account_from", conn);
-                        cmd2.Transaction = transaction;
-                        cmd2.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
-                        cmd2.Parameters.AddWithValue("@account_from", transfer.account_From);
-                        cmd2.ExecuteNonQuery();
-
-                        SqlCommand cmd3 = new SqlCommand("UPDATE account SET balance += @amount WHERE account_id = @account_to", conn);
-                        cmd3.Transaction = transaction;
-                        cmd3.Parameters.AddWithValue("@amount", transfer.amounttoTransfer);
-                        cmd3.Parameters.AddWithValue("@account_to", transfer.account_To);
-                        cmd3.ExecuteNonQuery();
-
-                        transaction.Commit();
-                        transfer = AcceptTransfer(transfer);
-
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        transfer = RejectTransfer(transfer);
-                        return transfer;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                transfer = RejectTransfer(transfer);
-                return transfer;
-            }
-            return transfer;
-        }
-
-        //returns transfer type ID
-        public int AddTransferType(string transferType)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("INSERT INTO transfer_type (transfer_type_desc) " +
-                                                    "OUTPUT INSERTED.transfer_type_id " +
-                                                    "VALUES @transfer_type_desc; ");
-                    cmd.Parameters.AddWithValue("@transfer_type_desc", transferType);
-
-                    int transferTypeId = Convert.ToInt32(cmd.ExecuteScalar());
-                    return transferTypeId;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Transfer Type Error");
-                return -1;
-            }
         }
 
 
-        //returns transfer status ID
-        public int AddTransferStatus(string transferStatus)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("INSERT INTO transfer_status (transfer_status_desc) " +
-                                                    "OUTPUT INSERTED.transfer_status_id " +
-                                                    "VALUES @transfer_status_desc; ");
-                    cmd.Parameters.AddWithValue("@transfer_status_desc", transferStatus);
-
-                    int transferStatusId = Convert.ToInt32(cmd.ExecuteScalar());
-                    return transferStatusId;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Transfer Status Error");
-                return -1;
-            }
-        }
 
         public bool CheckTransferValidity(Transfer transfer)
         {
@@ -200,27 +145,24 @@ namespace TenmoServer.DAO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
-                            "OUTPUT" +
-                            "SET transfer_status_desc = 'rejected' WHERE transfer.transfer_status_id = @status_id");
-                cmd4.Parameters.AddWithValue("@status_id", transfer.status_Id);
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 3");
+
+
                 cmd4.ExecuteNonQuery();
             }
-            transfer.status = "rejected";
             return transfer;
+
         }
 
         public Transfer AcceptTransfer(Transfer transfer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id " +
-                            "OUTPUT" +
-                            "SET transfer_status_desc = 'accepted' WHERE transfer.transfer_status_id = @status_id");
-                cmd4.Parameters.AddWithValue("@status_id", transfer.status_Id);
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2");
+
                 cmd4.ExecuteNonQuery();
             }
-            transfer.status = "accepted";
+
             return transfer;
         }
 
@@ -274,13 +216,13 @@ namespace TenmoServer.DAO
                     conn.Open();
 
 
-                    {
+                    
                         SqlCommand cmd = new SqlCommand("UPDATE transfer SET transfer_status_id = '1', transfer_type_id = '1')" +
                             "WHERE transfer = @pendingTransfer", conn);
                         cmd.Parameters.AddWithValue("@pendingTransfer", transfer.status_Id);
                         cmd.ExecuteNonQuery();
 
-                    }
+                    
 
                 }
             }
@@ -302,11 +244,11 @@ namespace TenmoServer.DAO
                     conn.Open();
                     SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
                         "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id");
-                        cmd.Parameters.AddWithValue("@status_id", transfer.status_Id), conn);
-                    
+                    cmd.Parameters.AddWithValue("@status_id", transfer.status_Id), conn);
+
                 }
             }
-        }
+}
 
         private Transfer CreateTransferFromReader(SqlDataReader reader)
         {
