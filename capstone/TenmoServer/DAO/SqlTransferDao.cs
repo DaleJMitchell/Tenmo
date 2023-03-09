@@ -14,7 +14,7 @@ namespace TenmoServer.DAO
         {
             connectionString = connString;
         }
-
+        private Transfer transferRequest = new Transfer();
         public Transfer SendMoney(Transfer transfer)
         {
             try
@@ -108,7 +108,6 @@ namespace TenmoServer.DAO
         {
             try 
             {
-                transfer = new Transfer();
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
@@ -132,6 +131,21 @@ namespace TenmoServer.DAO
             }
             
             return transfer;
+        }
+
+        public Transfer FullfillRequest(Transfer transfer)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection())
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
+                        "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id");
+                        cmd.Parameters.AddWithValue("@status_id", transfer.status_Id), conn);
+                    
+                }
+            }
         }
 
         private Transfer CreateTransferFromReader(SqlDataReader reader)
