@@ -71,13 +71,13 @@ namespace TenmoServer.Controllers
         [HttpGet("{userId}")]
         public ActionResult<IList<Transfer>> GetTransferHistory(int userId)
         {
-            return transferDao.List();
+            return transferDao.ListAllTransfer(userId);
         }
 
         [HttpGet("{userId}/{transferId}")]
         public ActionResult<Transfer> GetTransferById(int userId, int transferId)
         {
-            Transfer transfer = transferDao.Get(transferId);
+            Transfer transfer = transferDao.GetTransferById(transferId);
             if (transfer != null)
             {
                 return Ok(transfer);

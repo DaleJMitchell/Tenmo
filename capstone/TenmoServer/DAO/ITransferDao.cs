@@ -10,9 +10,9 @@ namespace TenmoServer.DAO
         Transfer SendMoney(Transfer newTransfer);
         //Needs to have a method called sendmoney that takes in transfer object called newTransfer. Returns transfer object
 
-        List<Transfer> List();
+        List<Transfer> ListAllTransfers(int userId);
 
-        Transfer Get(int id);
+        Transfer GetTransferById(int id);
 
     }
 }
