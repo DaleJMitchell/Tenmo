@@ -10,7 +10,7 @@ namespace TenmoClient
         private readonly TenmoConsoleService console = new TenmoConsoleService();
         private readonly TenmoApiService tenmoApiService;
         private ApiUser apiUser;
-        
+
 
         public TenmoApp(string apiUrl)
         {
@@ -81,7 +81,7 @@ namespace TenmoClient
 
             if (menuSelection == 1)
             {
-                ViewBalance();
+                ViewBalance(tenmoApiService.UserId);
             }
 
             if (menuSelection == 2)
@@ -167,11 +167,50 @@ namespace TenmoClient
             console.Pause();
         }
 
-        public void ViewBalance()
+        public void ViewBalance(int userId)
         {
-            
-            int balance = tenmoApiService.ViewBalance(1001);
-            Console.WriteLine(balance);
+            int balance = tenmoApiService.ViewBalance(userId);
+            Console.WriteLine(balance + "\nPress enter to continue");
+            Console.ReadLine();
+        }
+
+        public void ViewTransfers(int userId)
+        {
+            List<Transfer> transfers;
+            try
+            {
+                transfers = tenmoApiService.GetTransfers(userId);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid User.");
+                Console.WriteLine("Press enter to continue\n");
+                Console.ReadLine();
+                return;
+            }
+
+            if (transfers.Count == 0)
+            {
+                Console.WriteLine("You haven't made any transfers");
+                Console.WriteLine("Press enter to continue\n");
+                Console.ReadLine();
+                return;
+            }
+            Console.WriteLine("List of past transfers:\n");
+
+            foreach (Transfer transfer in transfers)
+            {
+                if (transfer.type == "request" || transfer.status == "pending" || transfer.status == "rejected")
+                {
+                    continue;
+                }
+                Console.WriteLine("Transfer ID: " + transfer.Id);
+                Console.WriteLine("Transfer Amount: " + transfer.amounttoTransfer);
+                Console.WriteLine("Account From: " + transfer.account_From);
+                Console.WriteLine("Account To: " + transfer.account_To);
+                Console.WriteLine();
+            }
+            Console.WriteLine("Press enter to continue\n");
             Console.ReadLine();
         }
 
@@ -179,10 +218,15 @@ namespace TenmoClient
         {
             List<User> users = tenmoApiService.ViewUsers();
 
-            foreach(User user in users)
+            Console.WriteLine("List of Users: \n");
+
+            foreach (User user in users)
             {
-                console.PrintSuccess(user.Username);
+                Console.WriteLine(user.Username);
             }
+
+            Console.WriteLine("Press enter to continue.");
+            Console.ReadLine();
         }
     }
 }

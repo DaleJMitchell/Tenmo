@@ -13,8 +13,6 @@ namespace TenmoClient.Services
 
         public TenmoApiService(string apiUrl) : base(apiUrl) { }
 
-        // Add methods to call api here...
-
         public int ViewBalance(int id)
         {
             RestRequest request = new RestRequest($"users/{id}");
@@ -26,8 +24,6 @@ namespace TenmoClient.Services
             }
             return response.Data;
         }
-
-
 
         public List<User> ViewUsers()
         {
@@ -104,8 +100,8 @@ namespace TenmoClient.Services
                 throw new HttpRequestException($"Failed to get transfers");
             }
             return response.Data;
-
         }
+
         public Transfer GetTransfer(int user_id, int transfer_id)
         {
             RestRequest request = new RestRequest($"transfer/{user_id}/{transfer_id}");
@@ -116,7 +112,6 @@ namespace TenmoClient.Services
                 throw new HttpRequestException($"Failed to get user transfer");
             }
             return response.Data;
-
         }
 
         public List<Transfer> GetRequests(int user_id)
@@ -129,12 +124,6 @@ namespace TenmoClient.Services
                 throw new HttpRequestException($"Failed to get requests");
             }
             return response.Data;
-
         }
-
-
-
-
-
     }
 }
