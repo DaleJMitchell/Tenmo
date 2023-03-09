@@ -68,16 +68,16 @@ namespace TenmoServer.Controllers
             return BadRequest(fulfilledRequest);
         }
 
-        [HttpGet]
-        public ActionResult<IList<Transfer>> GetTransferHistory()
+        [HttpGet("{userId}")]
+        public ActionResult<IList<Transfer>> GetTransferHistory(int userId)
         {
             return transferDao.List();
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Transfer> GetTransferById(int id)
+        [HttpGet("{userId}/{transferId}")]
+        public ActionResult<Transfer> GetTransferById(int userId, int transferId)
         {
-            Transfer transfer = transferDao.Get(id);
+            Transfer transfer = transferDao.Get(transferId);
             if (transfer != null)
             {
                 return Ok(transfer);
@@ -88,7 +88,7 @@ namespace TenmoServer.Controllers
             }
         }
 
-        [HttpGet("request")]
+        [HttpGet("request/{userId}")]
         public ActionResult<Transfer> GetRequests()
         {
             return transferDao.GetRequests();
