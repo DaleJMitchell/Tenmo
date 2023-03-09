@@ -86,7 +86,7 @@ namespace TenmoClient
 
             if (menuSelection == 2)
             {
-                // View your past transfers
+                ViewTransfers(tenmoApiService.UserId);
             }
 
             if (menuSelection == 3)
