@@ -16,7 +16,7 @@ namespace TenmoServer.DAO
         }
         private Transfer transferRequest = new Transfer();
 
-        //Creating a transfer or request
+        //#MAIN method. Creating a transfer OR request
         public Transfer CreateTransfer(Transfer transfer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -35,7 +35,7 @@ namespace TenmoServer.DAO
                     int transferId = Convert.ToInt32(cmd.ExecuteScalar());
                     transfer.Id = transferId;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Console.WriteLine("transfer did not go through");
                 }
@@ -53,6 +53,7 @@ namespace TenmoServer.DAO
             return transfer;
         }
 
+        //#HELPER Called when attempting to create a new transfer or fulfill a request
         public Transfer AttemptTransaction(Transfer transfer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -87,8 +88,7 @@ namespace TenmoServer.DAO
             }
         }
 
-
-
+        //#HELPER Checks both IDS to see if they are valid and that there is enough money in the FROM account
         public bool CheckTransferValidity(Transfer transfer)
         {
             try
@@ -151,6 +151,7 @@ namespace TenmoServer.DAO
             return true;
         }
 
+        //#HELPER AND MAIN method. Rejects a transfer
         public Transfer RejectTransfer(Transfer transfer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -164,6 +165,7 @@ namespace TenmoServer.DAO
 
         }
 
+        //#HELPER AND MAIN method. Accepts a transfer
         public Transfer AcceptTransfer(Transfer transfer)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -176,6 +178,7 @@ namespace TenmoServer.DAO
             return transfer;
         }
 
+        //#MAIN method. 
         public Transfer GetTransferById(int userId, int transferId)
         {
             Transfer transfer = null;
@@ -202,6 +205,7 @@ namespace TenmoServer.DAO
             return transfer;
         }
 
+        //#MAIN method. Lists all transfers for a specific user
         public List<Transfer> ListAllTransfers(int userId)
         {
             List<Transfer> list = new List<Transfer>();
@@ -229,7 +233,8 @@ namespace TenmoServer.DAO
             return list;
         }
 
-        public Transfer FullfillRequest(Transfer transfer)
+        //#HELPER and MAIN method. Fulfills a requested transfer 
+        public Transfer FulfillRequest(Transfer transfer)
         {
             bool transferValidity = CheckTransferValidity(transfer);
             if (!transferValidity)
@@ -241,6 +246,7 @@ namespace TenmoServer.DAO
             return transfer;
         }
 
+        //#HELPER. Creates a transfer object from a database row
         private Transfer CreateTransferFromReader(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();
@@ -252,7 +258,5 @@ namespace TenmoServer.DAO
 
             return transfer;
         }
-
-
     }
 }
