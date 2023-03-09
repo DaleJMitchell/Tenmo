@@ -99,7 +99,7 @@ namespace TenmoClient
             if (menuSelection == 4)
             {
                 // Send TE bucks
-                SendMoney(tenmoApiService.TransferBalance(Transfer transfer));
+               
             }
 
             if (menuSelection == 5)
@@ -187,8 +187,8 @@ namespace TenmoClient
             Console.WriteLine("TransferID: " + transfer.Id);
             Console.WriteLine("From: " + transfer.account_From);
             Console.WriteLine("To: " + transfer.account_To);
-            Console.WriteLine("Type: " + transfer.type);
-            Console.WriteLine("Status: " + transfer.status);
+            Console.WriteLine("Type: " + transfer.type_Id);
+            Console.WriteLine("Status: " + transfer.status_Id);
             Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
         }
 
@@ -218,7 +218,7 @@ namespace TenmoClient
 
             foreach (Transfer transfer in requests)
             {
-                if (transfer.type == "request")
+                if (transfer.type_Id == 1)
                 {
                     continue;
                 }
@@ -234,7 +234,7 @@ namespace TenmoClient
 
         public void SendMoney()
         {
-           Console.WriteLine() 
+            Console.WriteLine();
         }
 
         public void Request(Transfer transfer)
@@ -243,8 +243,8 @@ namespace TenmoClient
             Console.WriteLine("TransferID: " + transfer.Id);
             Console.WriteLine("From: " + transfer.account_From);
             Console.WriteLine("To: " + transfer.account_To);
-            Console.WriteLine("Type: " + transfer.type);
-            Console.WriteLine("Status: " + transfer.status);
+            Console.WriteLine("Type: " + transfer.type_Id);
+            Console.WriteLine("Status: " + transfer.status_Id);
             Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
         }
 
@@ -274,7 +274,7 @@ namespace TenmoClient
 
             foreach (Transfer transfer in transfers)
             {
-                if (transfer.type == "request" || transfer.status == "pending" || transfer.status == "rejected")
+                if (transfer.type_Id == 1 || transfer.status_Id == 1 || transfer.status_Id == 3)
                 {
                     continue;
                 }
