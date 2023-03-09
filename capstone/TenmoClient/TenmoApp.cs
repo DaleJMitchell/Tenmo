@@ -98,13 +98,14 @@ namespace TenmoClient
 
             if (menuSelection == 4)
             {
+                SendMoney(tenmoApiService.Id);
                 // Send TE bucks
                
             }
 
             if (menuSelection == 5)
             {
-                
+                RequestTransfer(tenmoApiService.Id);
                 // Request TE bucks
                 
             }
@@ -232,9 +233,38 @@ namespace TenmoClient
             Console.ReadLine();
         }
 
-        public void SendMoney()
+        public void SendMoney(Transfer transfer)
         {
-            Console.WriteLine();
+            Console.WriteLine("Please enter user ID that you wish to send to.");
+            Console.ReadLine();
+            Console.WriteLine("How much money in dollars and cents would you like to send?");
+            Console.ReadLine();
+            transfer = tenmoApiService.TransferBalance(transfer);
+            Console.WriteLine("TransferID: " + transfer.Id);
+            Console.WriteLine("From: " + transfer.account_From);
+            Console.WriteLine("To: " + transfer.account_To);
+            Console.WriteLine("Type: " + transfer.type_Id);
+            Console.WriteLine("Status: " + transfer.status_Id);
+            Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
+            Console.WriteLine("Press enter to continue\n");
+            Console.ReadLine();
+        }
+
+        public void RequestTransfer(Transfer transfer)
+        {
+            Console.WriteLine("Please enter user ID that you are requesting money from.");
+            Console.ReadLine();
+            Console.WriteLine("How much money in dollars and cents would you like to request?");
+            Console.ReadLine();
+            transfer = tenmoApiService.RequestTransfer(transfer);
+            Console.WriteLine("TransferID: " + transfer.Id);
+            Console.WriteLine("From: " + transfer.account_From);
+            Console.WriteLine("To: " + transfer.account_To);
+            Console.WriteLine("Type: " + transfer.type_Id);
+            Console.WriteLine("Status: " + transfer.status_Id);
+            Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
+            Console.WriteLine("Press enter to continue\n");
+            Console.ReadLine();
         }
 
         public void Request(Transfer transfer)
