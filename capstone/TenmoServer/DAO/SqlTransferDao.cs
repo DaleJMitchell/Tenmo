@@ -244,11 +244,16 @@ namespace TenmoServer.DAO
                 {
                     conn.Open();
                     SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
-                        "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id");
-                    cmd.Parameters.AddWithValue("@status_id", transfer.status_Id), conn);
+                        "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id", conn);
+                    cmd.Parameters.AddWithValue("@status_id", transfer.status_Id);
 
                 }
             }
+            catch
+            {
+                return null;
+            }
+            return null;
 }
 
         private Transfer CreateTransferFromReader(SqlDataReader reader)

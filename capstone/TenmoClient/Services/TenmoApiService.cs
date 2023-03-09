@@ -11,6 +11,8 @@ namespace TenmoClient.Services
     {
         public readonly string ApiUrl;
 
+        public Transfer Id { get; internal set; }
+
         public TenmoApiService(string apiUrl) : base(apiUrl) { }
 
         public int ViewBalance(int id)
