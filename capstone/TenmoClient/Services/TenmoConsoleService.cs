@@ -30,6 +30,7 @@ namespace TenmoClient.Services
             Console.WriteLine("3: View your pending requests");
             Console.WriteLine("4: Send TE bucks");
             Console.WriteLine("5: Request TE bucks");
+           
             Console.WriteLine("6: Log out");
             Console.WriteLine("0: Exit");
             Console.WriteLine("---------");
