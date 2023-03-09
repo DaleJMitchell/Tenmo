@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using TenmoServer.Models;
 using System.Collections.Generic;
+using System.Security.Cryptography.Xml;
 
 namespace TenmoServer.DAO
 {
@@ -48,6 +49,7 @@ namespace TenmoServer.DAO
                             "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id");
                         cmd4.Parameters.AddWithValue("@status_id", transfer.status_Id);
                         cmd4.ExecuteNonQuery();
+
                     }
                     catch(Exception ex)
                     {
@@ -70,6 +72,35 @@ namespace TenmoServer.DAO
         public List<Transfer> List()
         {
             return null;
+        }
+        public Transfer MakeRequest(Transfer transfer)
+        {
+            try 
+            {
+                transfer = new Transfer();
+
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    
+                    
+                    {
+                        SqlCommand cmd = new SqlCommand("UPDATE transfer SET transfer_status_id = '1', transfer_type_id = '1')" +
+                            "WHERE transfer = @pendingTransfer", conn);
+                        cmd.Parameters.AddWithValue("@pendingTransfer", transfer.status_Id);
+                        cmd.ExecuteNonQuery();
+                       
+                    }
+                  
+                }
+            }
+            catch (Exception ex) 
+            { 
+            
+            
+            }
+            
+            return transfer;
         }
 
         private Transfer CreateTransferFromReader(SqlDataReader reader)
