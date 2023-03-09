@@ -210,6 +210,7 @@ namespace TenmoServer.DAO
         {
             try
             {
+                transfer = new Transfer();
 
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {

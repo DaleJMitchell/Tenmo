@@ -99,13 +99,14 @@ namespace TenmoClient
             if (menuSelection == 4)
             {
                 // Send TE bucks
-                SendMoney(tenmoApiService.UserId);
+                SendMoney(tenmoApiService.TransferBalance(Transfer transfer));
             }
 
             if (menuSelection == 5)
             {
+                
                 // Request TE bucks
-                Request(tenmoApiService.UserId);
+                
             }
 
             if (menuSelection == 6)
@@ -193,35 +194,52 @@ namespace TenmoClient
 
         public void GetRequests(int user_id)
         {
-            List<Transfer> transfer;
-            foreach (Transfer properties in transfer)
+            List<Transfer> requests;
+            try
             {
-                if (properties.type == "request")
-                {
-                    Console.WriteLine("TransferID: " + transfer.Id);
-                    Console.WriteLine("From: " + transfer.account_From);
-                    Console.WriteLine("To: " + transfer.account_To);
-                    Console.WriteLine("Type: " + transfer.type);
-                    Console.WriteLine("Status: " + transfer.status);
-                    Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
-                }
+                requests = tenmoApiService.GetTransfers(user_id);
             }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid User.");
+                Console.WriteLine("Press enter to continue\n");
+                Console.ReadLine();
+                return;
+            }
+
+            if (requests.Count == 0)
+            {
+                Console.WriteLine("You don't have any requests");
+                Console.WriteLine("Press enter to continue\n");
+                Console.ReadLine();
+                return;
+            }
+            
+
+            foreach (Transfer transfer in requests)
+            {
+                if (transfer.type == "request")
+                {
+                    continue;
+                }
+                Console.WriteLine("Transfer ID: " + transfer.Id);
+                Console.WriteLine("Transfer Amount: " + transfer.amounttoTransfer);
+                Console.WriteLine("Account From: " + transfer.account_From);
+                Console.WriteLine("Account To: " + transfer.account_To);
+                Console.WriteLine();
+            }
+            Console.WriteLine("Press enter to continue\n");
+            Console.ReadLine();
         }
 
-        public void SendMoney(Transfer transfer)
+        public void SendMoney()
         {
-            Transfer transfer = tenmoApiService.TransferBalance(user_id);
-            Console.WriteLine("TransferID: " + transfer.Id);
-            Console.WriteLine("From: " + transfer.account_From);
-            Console.WriteLine("To: " + transfer.account_To);
-            Console.WriteLine("Type: " + transfer.type);
-            Console.WriteLine("Status: " + transfer.status);
-            Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
+           Console.WriteLine() 
         }
 
         public void Request(Transfer transfer)
         {
-            Transfer transfer = tenmoApiService.RequestTransfer(transfer);
+            transfer = tenmoApiService.RequestTransfer(transfer);
             Console.WriteLine("TransferID: " + transfer.Id);
             Console.WriteLine("From: " + transfer.account_From);
             Console.WriteLine("To: " + transfer.account_To);
