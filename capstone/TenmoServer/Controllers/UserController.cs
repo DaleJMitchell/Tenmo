@@ -30,9 +30,9 @@ namespace TenmoServer.Controllers
         }
 
         [HttpGet]
-        public List<User> GetAllUsers()
+        public List<int> ViewAccountIds()
         {
-            return userDao.GetUsers();
+            return userDao.ViewAccountIds();
         }
 
         [HttpGet("{userId}/account")]
