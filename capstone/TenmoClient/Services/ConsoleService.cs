@@ -30,6 +30,13 @@ namespace TenmoClient.Services
             Console.ResetColor();
         }
 
+        internal void PrintSuccess(int message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
         /************************************************************
             Prompt methods (get user input)
         ************************************************************/
