@@ -11,16 +11,13 @@ namespace TenmoServer.Controllers
     public class TransferController : ControllerBase
     {
         private static ITransferDao transferDao;
-        public TransferController() 
-        { 
-        
-        }
+      
 
         [HttpPost]
         public ActionResult<Transfer> SendMoney(Transfer transfer)
         {
-            Transfer newTransfer = transferDao.SendMoney(transfer);
-            if (newTransfer.status == "accepted")
+            Transfer newTransfer = transferDao.CreateTransfer(transfer);
+            if (newTransfer.status_Id == 2)
             {
                 return Accepted(newTransfer);
             }
@@ -30,10 +27,10 @@ namespace TenmoServer.Controllers
         [HttpPost("request")]
         public ActionResult<Transfer> MakeRequest(Transfer transfer)
         {
-            Transfer newRequest = transferDao.MakeRequest(transfer);
-            if (newRequest.status == "pending")
+            Transfer newRequest = transferDao.CreateTransfer(transfer);
+            if (newRequest.status_Id == 1)
             {
-                return Created(newRequest);
+                return Ok(newRequest);
             }
             return BadRequest(newRequest);
         }
@@ -42,11 +39,11 @@ namespace TenmoServer.Controllers
         public ActionResult<Transfer> FulfillRequst(Transfer transfer)
         {
             Transfer fulfilledRequest = transferDao.FulfillRequest(transfer);
-            if (fulfilledRequest == null)
+            if (fulfilledRequest.status_Id == 3)
             {
-                return NotFound();
+                return BadRequest(fulfilledRequest);
             }
-            if (fulfilledRequest.status == "approved")
+            if (fulfilledRequest.status_Id == 2)
             {
                 return Accepted(fulfilledRequest);
             }
@@ -56,12 +53,9 @@ namespace TenmoServer.Controllers
         [HttpPut("request/reject")]
         public ActionResult<Transfer> RejectRequst(Transfer transfer)
         {
-            Transfer fulfilledRequest = transferDao.RejectRequest(transfer);
-            if (fulfilledRequest == null)
-            {
-                return NotFound();
-            }
-            if (fulfilledRequest.status == "rejected")
+            Transfer fulfilledRequest = transferDao.RejectTransfer(transfer);
+            
+            if (fulfilledRequest.status_Id == 3)
             {
                 return Accepted(fulfilledRequest);
             }
@@ -71,13 +65,13 @@ namespace TenmoServer.Controllers
         [HttpGet("{userId}")]
         public ActionResult<IList<Transfer>> GetTransferHistory(int userId)
         {
-            return transferDao.ListAllTransfer(userId);
+            return transferDao.ListAllTransfers(userId);
         }
 
         [HttpGet("{userId}/{transferId}")]
         public ActionResult<Transfer> GetTransferById(int userId, int transferId)
         {
-            Transfer transfer = transferDao.GetTransferById(transferId);
+            Transfer transfer = transferDao.GetTransferById(userId,transferId);
             if (transfer != null)
             {
                 return Ok(transfer);
@@ -88,11 +82,7 @@ namespace TenmoServer.Controllers
             }
         }
 
-        //To do: add status codes
-        [HttpGet("request/{userId}")]
-        public ActionResult<List<Transfer>> GetRequests()
-        {
-            return transferDao.GetRequests();
-        }
+        
+       
     }
 }
