@@ -119,5 +119,17 @@ namespace TenmoClient.Services
             }
             return response.Data;
         }
+
+        public int GetAccountId(int userId)
+        {
+            RestRequest request = new RestRequest($"users/{userId}/account");
+            IRestResponse<int> response = client.Get<int>(request);
+
+            if (!response.IsSuccessful)
+            {
+                throw new HttpRequestException($"Account ID Could Not Be Located");
+            }
+            return response.Data;
+        }
     }
 }

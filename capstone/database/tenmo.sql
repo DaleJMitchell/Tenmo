@@ -37,7 +37,7 @@ CREATE TABLE tenmo_user (
 CREATE TABLE account (
 	account_id int IDENTITY(2001,1) NOT NULL,
 	user_id int NOT NULL,
-	balance decimal(13, 2) NOT NULL,
+	balance decimal(13, 2) DEFAULT 1000,
 	CONSTRAINT PK_account PRIMARY KEY (account_id),
 	CONSTRAINT FK_account_user FOREIGN KEY (user_id) REFERENCES tenmo_user (user_id)
 )
@@ -91,9 +91,9 @@ INSERT INTO transfer_type (transfer_type_desc) VALUES ('Send');
 
 INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount)
 VALUES('1', '2', '2001', '2002', '150'),
-('1', '2', '2002', '2003', '200'),
+('1', '1', '2002', '2003', '200'),
 ('2', '1', '2003', '2004', '350'),
-('1', '2', '2004', '2005', '200'),
+('2', '2', '2004', '2005', '200'),
 ('2', '3', '2005', '2001', '250')
 
 SELECT * FROM transfer
