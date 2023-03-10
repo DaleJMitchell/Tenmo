@@ -98,7 +98,7 @@ namespace TenmoClient
 
             if (menuSelection == 4)
             {
-                SendMoney(tenmoApiService.Id);
+                SendMoney();
                 // Send TE bucks
 
             }
@@ -233,21 +233,30 @@ namespace TenmoClient
             Console.ReadLine();
         }
 
-        public void SendMoney(Transfer transfer)
+        public void SendMoney()
         {
+            Transfer transfer = new Transfer();
+            transfer.account_From = tenmoApiService.UserId;
+            transfer.type_Id = 2;
+            transfer.status_Id = 1;
             Console.WriteLine("Please enter user ID that you wish to send to.");
-            Console.ReadLine();
+            transfer.account_To = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("How much money in dollars and cents would you like to send?");
-            Console.ReadLine();
+            transfer.amounttoTransfer = Convert.ToInt32(Console.ReadLine());
             transfer = tenmoApiService.TransferBalance(transfer);
-            Console.WriteLine("TransferID: " + transfer.Id);
-            Console.WriteLine("From: " + transfer.account_From);
-            Console.WriteLine("To: " + transfer.account_To);
-            Console.WriteLine("Type: " + transfer.type_Id);
-            Console.WriteLine("Status: " + transfer.status_Id);
-            Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
-            Console.WriteLine("Press enter to continue\n");
-            Console.ReadLine();
+
+            if (transfer.status_Id == 2)
+            {
+                console.PrintSuccess("Transfer approved");
+            }
+            if(transfer.status_Id == 3)
+            {
+                console.PrintError("Status rejected");
+            }
+            console.Pause();
+
+           
+            
         }
 
         public void RequestTransfer(Transfer transfer)
