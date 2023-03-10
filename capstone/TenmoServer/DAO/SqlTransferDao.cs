@@ -42,13 +42,7 @@ namespace TenmoServer.DAO
             }
             if (transfer.type_Id == 2)
             {
-                bool transferValidity = CheckTransferValidity(transfer);
-                if (!transferValidity)
-                {
-                    transfer = RejectTransfer(transfer);
-                    return transfer;
-                }
-                transfer = AttemptTransaction(transfer);
+                transfer = FulfillRequest(transfer);
             }
             return transfer;
         }
@@ -234,17 +228,13 @@ namespace TenmoServer.DAO
         //#HELPER and MAIN method. Fulfills a requested transfer 
         public Transfer FulfillRequest(Transfer transfer)
         {
-
             bool transferValidity = CheckTransferValidity(transfer);
-
             if (!transferValidity)
             {
                 transfer = RejectTransfer(transfer);
                 return transfer;
             }
             transfer = AttemptTransaction(transfer);
-
-
             return transfer;
         }
 
