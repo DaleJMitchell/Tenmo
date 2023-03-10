@@ -100,14 +100,14 @@ namespace TenmoClient
             {
                 SendMoney(tenmoApiService.Id);
                 // Send TE bucks
-               
+
             }
 
             if (menuSelection == 5)
             {
                 RequestTransfer(tenmoApiService.Id);
                 // Request TE bucks
-                
+
             }
 
             if (menuSelection == 6)
@@ -215,7 +215,7 @@ namespace TenmoClient
                 Console.ReadLine();
                 return;
             }
-            
+
 
             foreach (Transfer transfer in requests)
             {
@@ -281,6 +281,7 @@ namespace TenmoClient
         public void ViewTransfers(int userId)
         {
             List<Transfer> transfers;
+
             try
             {
                 transfers = tenmoApiService.GetTransfers(userId);
@@ -292,6 +293,7 @@ namespace TenmoClient
                 Console.ReadLine();
                 return;
             }
+
 
             if (transfers.Count == 0)
             {

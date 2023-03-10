@@ -41,7 +41,8 @@ namespace TenmoClient.Services
 
         public Transfer TransferBalance(Transfer transfer)
         {
-            RestRequest request = new RestRequest("transfer");
+            IRestRequest request = new RestRequest("transfer");
+            request = request.AddJsonBody(transfer);
             IRestResponse<Transfer> response = client.Post<Transfer>(request);
 
             if (!response.IsSuccessful)
@@ -55,7 +56,8 @@ namespace TenmoClient.Services
 
         public Transfer RequestTransfer(Transfer transfer)
         {
-            RestRequest request = new RestRequest("transfer/request");
+            IRestRequest request = new RestRequest("transfer/request");
+            request = request.AddJsonBody(transfer);
             IRestResponse<Transfer> response = client.Post<Transfer>(request);
 
             if (!response.IsSuccessful)
@@ -68,7 +70,8 @@ namespace TenmoClient.Services
 
         public Transfer Fulfill(Transfer transfer)
         {
-            RestRequest request = new RestRequest("transfer/request/fulfill");
+            IRestRequest request = new RestRequest("transfer/request/fulfill");
+            request = request.AddJsonBody(transfer);
             IRestResponse<Transfer> response = client.Put<Transfer>(request);
 
             if (!response.IsSuccessful)
@@ -81,7 +84,8 @@ namespace TenmoClient.Services
 
         public Transfer Reject(Transfer transfer)
         {
-            RestRequest request = new RestRequest("transfer/request/reject");
+            IRestRequest request = new RestRequest("transfer/request/reject");
+            request = request.AddJsonBody(transfer);
             IRestResponse<Transfer> response = client.Put<Transfer>(request);
 
             if (!response.IsSuccessful)
@@ -112,18 +116,6 @@ namespace TenmoClient.Services
             if (!response.IsSuccessful)
             {
                 throw new HttpRequestException($"Failed to get user transfer");
-            }
-            return response.Data;
-        }
-
-        public List<Transfer> GetRequests(int user_id)
-        {
-            RestRequest request = new RestRequest($"transfer/request/{user_id}/");
-            IRestResponse<List<Transfer>> response = client.Get<List<Transfer>>(request);
-
-            if (!response.IsSuccessful)
-            {
-                throw new HttpRequestException($"Failed to get requests");
             }
             return response.Data;
         }

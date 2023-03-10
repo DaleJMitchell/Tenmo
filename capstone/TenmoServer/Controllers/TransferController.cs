@@ -10,8 +10,12 @@ namespace TenmoServer.Controllers
     [ApiController]
     public class TransferController : ControllerBase
     {
-        private static ITransferDao transferDao;
-      
+        private readonly ITransferDao transferDao;
+
+        public TransferController(ITransferDao _transferDao)
+        {
+            this.transferDao = _transferDao;
+        }
 
         [HttpPost]
         public ActionResult<Transfer> SendMoney(Transfer transfer)
@@ -83,7 +87,11 @@ namespace TenmoServer.Controllers
             }
         }
 
-        
+        [HttpGet]
+        public int GetFour()
+        {
+            return 4;
+        }
        
     }
 }
