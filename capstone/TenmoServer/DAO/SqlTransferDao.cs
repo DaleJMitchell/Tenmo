@@ -156,9 +156,8 @@ namespace TenmoServer.DAO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 3");
-
-
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 3 WHERE transfer_id = @transfer_id;");
+                cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
                 cmd4.ExecuteNonQuery();
             }
             return transfer;
@@ -170,11 +169,10 @@ namespace TenmoServer.DAO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2");
-
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = @transfer_id;");
+                cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
                 cmd4.ExecuteNonQuery();
             }
-
             return transfer;
         }
 
