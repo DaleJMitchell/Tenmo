@@ -1,5 +1,14 @@
+DELETE FROM transfer
+DELETE FROM tenmo_user
+DELETE FROM account
+
+
 INSERT INTO tenmo_user(username, password_hash, salt)
-VALUES ('duck', 'mooooooooo', 'password5000')
+VALUES ('dog', 'doggie', '4(j3Li95'),
+('cat', 'kitty', '3456Kf('),
+('duck', 'mooooooooo', '47fhgK('),
+('rabbit', 'ribbit', '8293hgT('),
+('crocodile', 'aaaah', '8d38dsE')
 
 SELECT * FROM tenmo_user
 
@@ -13,7 +22,11 @@ transfer_type_id int NOT NULL,
 
 
 	INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount)
-	VALUES('1', '2', '2001', '2004', '5000')
+	VALUES('1', '2', '2013', '2014', '150'),
+	('1', '2', '2014', '2015', '200'),
+	('2', '1', '2017', '2016', '350'),
+	('1', '2', '2016', '2015', '200'),
+	('2', '3', '2017', '2014', '250')
 
 	SELECT * FROM transfer
 
@@ -22,7 +35,21 @@ transfer_type_id int NOT NULL,
 	balance decimal(13, 2) NOT NULL,
 
 	INSERT INTO account(user_id ,balance)
-	VALUES('1007', '4975')
+	VALUES(', '500'),
+	('1006', '20'),
+	('1005', '999999999.00'),
+	('1004', '5000'),
+	('1001', '1000')
+
+	DELETE FROM account
+
+	INSERT INTO account(user_id, balance)
+	VALUES ('1008', '500'),
+	('1009', '999999999'),
+	('1010', '2500'),
+	('1011', '7549'),
+	('1012', '3000')
+
 
 	SELECT * FROM account
 

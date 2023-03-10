@@ -60,7 +60,7 @@ namespace TenmoClient
                 }
                 if (menuSelection == 3)
                 {
-                    // Register a new user
+                    //views users
                     ViewUsers();
                     return true;    // Keep the main menu loop going
                 }
@@ -87,13 +87,13 @@ namespace TenmoClient
             if (menuSelection == 2)
             {
                 // View your past transfers
-                ViewTransfers(tenmoApiService.UserId);
+                ViewPreviousTransfers(tenmoApiService.UserId);
             }
 
             if (menuSelection == 3)
             {
                 // View your pending requests
-                GetRequests(tenmoApiService.UserId);
+                ViewPendingRequests(tenmoApiService.UserId);
             }
 
             if (menuSelection == 4)
@@ -178,8 +178,7 @@ namespace TenmoClient
         public void ViewBalance(int userId)
         {
             int balance = tenmoApiService.ViewBalance(userId);
-            Console.WriteLine(balance + "\nPress enter to continue");
-            Console.ReadLine();
+            console.Pause();
         }
 
         public void GetTransfer(int userId, int transfer_id)
@@ -193,44 +192,46 @@ namespace TenmoClient
             Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
         }
 
-        public void GetRequests(int user_id)
+        public void ViewPendingRequests(int user_id)
         {
-            List<Transfer> requests;
+            List<Transfer> transfers;
             try
             {
-                requests = tenmoApiService.GetTransfers(user_id);
+                transfers = tenmoApiService.GetTransfers(user_id);
             }
             catch (Exception)
             {
                 Console.WriteLine("Invalid User.");
-                Console.WriteLine("Press enter to continue\n");
-                Console.ReadLine();
+                console.Pause();
                 return;
+            }
+
+            List<Transfer> requests = new List<Transfer>();
+            foreach(Transfer transfer in transfers)
+            {
+                if (transfer.type_Id == 1 && transfer.status_Id == 1)
+                {
+                    requests.Add(transfer);
+                }
             }
 
             if (requests.Count == 0)
             {
                 Console.WriteLine("You don't have any requests");
-                Console.WriteLine("Press enter to continue\n");
-                Console.ReadLine();
+                console.Pause();
                 return;
             }
 
-
-            foreach (Transfer transfer in requests)
+            Console.WriteLine("List of previous requests:\n")
+            foreach (Transfer request in requests)
             {
-                if (transfer.type_Id == 1)
-                {
-                    continue;
-                }
-                Console.WriteLine("Transfer ID: " + transfer.Id);
-                Console.WriteLine("Transfer Amount: " + transfer.amounttoTransfer);
-                Console.WriteLine("Account From: " + transfer.account_From);
-                Console.WriteLine("Account To: " + transfer.account_To);
+                Console.WriteLine("Transfer ID: " + request.Id);
+                Console.WriteLine("Transfer Amount: " + request.amounttoTransfer);
+                Console.WriteLine("Account From: " + request.account_From);
+                Console.WriteLine("Account To: " + request.account_To);
                 Console.WriteLine();
             }
-            Console.WriteLine("Press enter to continue\n");
-            Console.ReadLine();
+            console.Pause();
         }
 
         public void SendMoney()
@@ -272,8 +273,7 @@ namespace TenmoClient
             Console.WriteLine("Type: " + transfer.type_Id);
             Console.WriteLine("Status: " + transfer.status_Id);
             Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
-            Console.WriteLine("Press enter to continue\n");
-            Console.ReadLine();
+            console.Pause();
         }
 
         public void Request(Transfer transfer)
@@ -287,7 +287,7 @@ namespace TenmoClient
             Console.WriteLine("Transfer Amount " + transfer.amounttoTransfer);
         }
 
-        public void ViewTransfers(int userId)
+        public void ViewPreviousTransfers(int userId)
         {
             List<Transfer> transfers;
 
@@ -303,30 +303,32 @@ namespace TenmoClient
                 return;
             }
 
+            List<Transfer> previousTransfers = new List<Transfer>();
+            foreach (Transfer transfer in transfers)
+            {
+                if (transfer.type_Id != 1 && transfer.status_Id == 2)
+                {
+                    previousTransfers.Add(transfer);
+                }
+            }
 
-            if (transfers.Count == 0)
+            if (previousTransfers.Count == 0)
             {
                 Console.WriteLine("You haven't made any transfers");
-                Console.WriteLine("Press enter to continue\n");
-                Console.ReadLine();
+                console.Pause();
                 return;
             }
             Console.WriteLine("List of past transfers:\n");
 
-            foreach (Transfer transfer in transfers)
+            foreach (Transfer transfer in previousTransfers)
             {
-                if (transfer.type_Id == 1 || transfer.status_Id == 1 || transfer.status_Id == 3)
-                {
-                    continue;
-                }
                 Console.WriteLine("Transfer ID: " + transfer.Id);
                 Console.WriteLine("Transfer Amount: " + transfer.amounttoTransfer);
                 Console.WriteLine("Account From: " + transfer.account_From);
                 Console.WriteLine("Account To: " + transfer.account_To);
                 Console.WriteLine();
             }
-            Console.WriteLine("Press enter to continue\n");
-            Console.ReadLine();
+            console.Pause();
         }
 
         public void ViewUsers()
