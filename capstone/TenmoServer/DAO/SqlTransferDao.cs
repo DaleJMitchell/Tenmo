@@ -156,9 +156,8 @@ namespace TenmoServer.DAO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 3");
-
-
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 3 WHERE transfer_id = @transfer_id;");
+                cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
                 cmd4.ExecuteNonQuery();
             }
             return transfer;
@@ -170,11 +169,10 @@ namespace TenmoServer.DAO
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2");
-
+                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = @transfer_id;");
+                cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
                 cmd4.ExecuteNonQuery();
             }
-
             return transfer;
         }
 
@@ -239,21 +237,23 @@ namespace TenmoServer.DAO
             bool transferValidity = CheckTransferValidity(transfer);
             if (!transferValidity)
             {
-                using (SqlConnection conn = new SqlConnection())
+                try
                 {
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
-                        "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id", conn);
-                    cmd.Parameters.AddWithValue("@status_id", transfer.status_Id);
-
+                    using (SqlConnection conn = new SqlConnection())
+                    {
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
+                            "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id", conn);
+                        cmd.Parameters.AddWithValue("@status_id", transfer.status_Id);
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
                 }
             }
-            catch
-            {
-                return null;
-            }
             return null;
-}
+        }
 
         //#HELPER. Creates a transfer object from a database row
         private Transfer CreateTransferFromReader(SqlDataReader reader)
