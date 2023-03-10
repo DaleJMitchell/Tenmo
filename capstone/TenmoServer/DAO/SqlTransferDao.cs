@@ -74,8 +74,7 @@ namespace TenmoServer.DAO
                 }
                 catch (Exception ex)
                 {
-                    try { transaction.Rollback(); }
-                    catch (Exception) { }
+                    transaction.Rollback();
                     transfer = RejectTransfer(transfer);
                     return transfer;
                 }
@@ -86,69 +85,69 @@ namespace TenmoServer.DAO
         //#HELPER Checks both IDS to see if they are valid and that there is enough money in the FROM account
         public bool CheckTransferValidity(Transfer transfer)
         {
-            //try
-            //{
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                //Check both account IDS
-                int numberOfAccounts = 0;
-                conn.Open();
-                SqlCommand cmd1 = new SqlCommand("SELECT * FROM account WHERE account_id = @account_from;", conn);
-                cmd1.Parameters.AddWithValue("@account_from", transfer.account_From);
-
-                SqlDataReader sdr = cmd1.ExecuteReader();
-
-                if (sdr.Read())
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    numberOfAccounts++;
-                }
-                if (numberOfAccounts == 0)
-                {
-                    throw new Exception("Invalid sending account");
-                }
+                    //Check both account IDS
+                    int numberOfAccounts = 0;
+                    conn.Open();
+                    SqlCommand cmd1 = new SqlCommand("SELECT * FROM account WHERE account_id = @account_from;", conn);
+                    cmd1.Parameters.AddWithValue("@account_from", transfer.account_From);
 
-            }
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                int numberOfAccounts = 0;
-                conn.Open();
-                SqlCommand cmd2 = new SqlCommand("SELECT * FROM account WHERE account_id = @account_to;", conn);
-                cmd2.Parameters.AddWithValue("@account_to", transfer.account_To);
+                    SqlDataReader sdr = cmd1.ExecuteReader();
 
-                SqlDataReader sdr2 = cmd2.ExecuteReader();
-
-                if (sdr2.Read())
-                {
-                    numberOfAccounts++;
-                }
-                if (numberOfAccounts == 0)
-                {
-                    throw new Exception("Invalid receiving account");
-                }
-            }
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                //Check the balance of sending account
-                SqlCommand cmd3 = new SqlCommand("SELECT balance FROM account WHERE account_id = @account_from;", conn);
-                cmd3.Parameters.AddWithValue("@account_from", transfer.account_From);
-
-                SqlDataReader sdr3 = cmd3.ExecuteReader();
-
-                if (sdr3.Read())
-                {
-                    int balance = Convert.ToInt32(sdr3["balance"]);
-                    if (balance < transfer.amounttoTransfer)
+                    if (sdr.Read())
                     {
-                        throw new Exception("Insufficient Funds");
+                        numberOfAccounts++;
+                    }
+                    if (numberOfAccounts == 0)
+                    {
+                        throw new Exception("Invalid sending account");
+                    }
+
+                }
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    int numberOfAccounts = 0;
+                    conn.Open();
+                    SqlCommand cmd2 = new SqlCommand("SELECT * FROM account WHERE account_id = @account_to;", conn);
+                    cmd2.Parameters.AddWithValue("@account_to", transfer.account_To);
+
+                    SqlDataReader sdr2 = cmd2.ExecuteReader();
+
+                    if (sdr2.Read())
+                    {
+                        numberOfAccounts++;
+                    }
+                    if (numberOfAccounts == 0)
+                    {
+                        throw new Exception("Invalid receiving account");
+                    }
+                }
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    //Check the balance of sending account
+                    SqlCommand cmd3 = new SqlCommand("SELECT balance FROM account WHERE account_id = @account_from;", conn);
+                    cmd3.Parameters.AddWithValue("@account_from", transfer.account_From);
+
+                    SqlDataReader sdr3 = cmd3.ExecuteReader();
+
+                    if (sdr3.Read())
+                    {
+                        int balance = Convert.ToInt32(sdr3["balance"]);
+                        if (balance < transfer.amounttoTransfer)
+                        {
+                            throw new Exception("Insufficient Funds");
+                        }
                     }
                 }
             }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return false;
-            //}
+            catch (Exception ex)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -162,6 +161,7 @@ namespace TenmoServer.DAO
                 cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
                 cmd4.ExecuteNonQuery();
             }
+            transfer.status_Id = 3;
             return transfer;
 
         }
@@ -169,12 +169,19 @@ namespace TenmoServer.DAO
         //#HELPER AND MAIN method. Accepts a transfer
         public Transfer AcceptTransfer(Transfer transfer)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = @transfer_id;", conn);
-                cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
-                cmd4.ExecuteNonQuery();
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    SqlCommand cmd4 = new SqlCommand("UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = @transfer_id;", conn);
+                    cmd4.Parameters.AddWithValue("@transfer_id", transfer.Id);
+                    cmd4.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
             transfer.status_Id = 2;
             return transfer;
@@ -238,18 +245,18 @@ namespace TenmoServer.DAO
         //#HELPER and MAIN method. Fulfills a requested transfer 
         public Transfer FulfillRequest(Transfer transfer)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("UPDATE transfer SET transfer_status_id = 2 WHERE transfer_id = @transfer_id", conn);
-                cmd.Parameters.AddWithValue("@transfer_id", transfer.Id);
-                cmd.ExecuteNonQuery();
-            }
             bool transferValidity = CheckTransferValidity(transfer);
             if (!transferValidity)
             {
                 transfer = RejectTransfer(transfer);
                 return transfer;
+            }
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("UPDATE transfer SET transfer_status_id = 2, transfer_type_id = 2 WHERE transfer_id = @transfer_id", conn);
+                cmd.Parameters.AddWithValue("@transfer_id", transfer.Id);
+                cmd.ExecuteNonQuery();
             }
             transfer = AttemptTransaction(transfer);
             return transfer;
@@ -259,8 +266,9 @@ namespace TenmoServer.DAO
         private Transfer CreateTransferFromReader(SqlDataReader reader)
         {
             Transfer transfer = new Transfer();
-            transfer.Id = Convert.ToInt32(reader["transfer_type_id"]);
+            transfer.Id = Convert.ToInt32(reader["transfer_id"]);
             transfer.status_Id = Convert.ToInt32(reader["transfer_status_id"]);
+            transfer.type_Id = Convert.ToInt32(reader["transfer_type_id"]);
             transfer.account_From = Convert.ToInt32(reader["account_from"]);
             transfer.account_To = Convert.ToInt32(reader["account_to"]);
             transfer.amounttoTransfer = Convert.ToDecimal(reader["amount"]);

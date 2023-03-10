@@ -27,10 +27,10 @@ namespace TenmoClient.Services
             return response.Data;
         }
 
-        public List<User> ViewUsers()
+        public List<int> ViewAccountIds()
         {
             RestRequest request = new RestRequest("users");
-            IRestResponse<List<User>> response = client.Get<List<User>>(request);
+            IRestResponse<List<int>> response = client.Get<List<int>>(request);
 
             if (!response.IsSuccessful)
             {
