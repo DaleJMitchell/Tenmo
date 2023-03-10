@@ -58,10 +58,42 @@ CREATE TABLE transfer (
 	CONSTRAINT CK_transfer_amount_gt_0 CHECK ((amount>0))
 )
 
+DELETE FROM transfer_type
+DELETE FROM transfer_status
+DELETE FROM transfer
+DELETE FROM account
+DELETE FROM tenmo_user
 
+INSERT INTO tenmo_user(username, password_hash, salt)
+VALUES ('dog', 'doggie', '4(j3Li95'),
+('cat', 'kitty', '3456Kf('),
+('duck', 'mooooooooo', '47fhgK('),
+('rabbit', 'ribbit', '8293hgT('),
+('crocodile', 'aaaah', '8d38dsE')
+
+SELECT * FROM tenmo_user
+
+INSERT INTO account(user_id, balance)
+VALUES ('1001', '500'),
+('1002', '999999999'),
+('1003', '2500'),
+('1004', '7549'),
+('1005', '3000')
+
+SELECT * FROM account
+	
 INSERT INTO transfer_status (transfer_status_desc) VALUES ('Pending');
 INSERT INTO transfer_status (transfer_status_desc) VALUES ('Approved');
 INSERT INTO transfer_status (transfer_status_desc) VALUES ('Rejected');
 
 INSERT INTO transfer_type (transfer_type_desc) VALUES ('Request');
 INSERT INTO transfer_type (transfer_type_desc) VALUES ('Send');
+
+INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount)
+VALUES('1', '2', '2001', '2002', '150'),
+('1', '2', '2002', '2003', '200'),
+('2', '1', '2003', '2004', '350'),
+('1', '2', '2004', '2005', '200'),
+('2', '3', '2005', '2001', '250')
+
+SELECT * FROM transfer
