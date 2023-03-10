@@ -234,25 +234,18 @@ namespace TenmoServer.DAO
         //#HELPER and MAIN method. Fulfills a requested transfer 
         public Transfer FulfillRequest(Transfer transfer)
         {
+
             bool transferValidity = CheckTransferValidity(transfer);
+
             if (!transferValidity)
             {
-                try
-                {
-                    using (SqlConnection conn = new SqlConnection())
-                    {
-                        conn.Open();
-                        SqlCommand cmd = new SqlCommand("UPDATE transfer_status_id JOIN transfer ON transfer_status.transfer_status_id = transfer.transfer_status_id\" +\r\n  " +
-                            "SET transfer_status_desc = 'Approved' WHERE transfer.transfer_status_id = @status_id", conn);
-                        cmd.Parameters.AddWithValue("@status_id", transfer.status_Id);
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
+                transfer = RejectTransfer(transfer);
+                return transfer;
             }
-            return null;
+            transfer = AttemptTransaction(transfer);
+
+
+            return transfer;
         }
 
         //#HELPER. Creates a transfer object from a database row
